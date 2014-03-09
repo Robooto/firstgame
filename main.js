@@ -1,10 +1,10 @@
 // Initialize Phaser, and creates a 400x490px game
 var game = new Phaser.Game(400, 490, Phaser.AUTO, 'game_div');
-var game_state = {};
+
 
 // Creates a new 'main' state that wil contain the game
-game_state.main = function () {};
-game_state.main.prototype = {
+
+var main_state = {
 
     preload: function () {
         // Function called first to load all the assets
@@ -16,6 +16,9 @@ game_state.main.prototype = {
 
         // load in the pipes
         this.game.load.image('pipe', 'assets/pipe.png');
+        
+        // load sound
+        this.game.load.audio('jump', 'assets/jump.wav');
 
     },
 
@@ -48,6 +51,12 @@ game_state.main.prototype = {
         var style = { font: "30px Arial", fill: "#ffffff" };
         // adding score to game
         this.label_score = this.game.add.text(20, 20, "0", style);
+        
+        //anchor point to bird
+        this.bird.anchor.setTo(-0.2, 0.5);
+        
+        //add jump sound
+        this.jump_sound = this.game.add.audio('jump');
                      
     },
 
@@ -59,13 +68,32 @@ game_state.main.prototype = {
         if (this.bird.inWorld == false)
             this.restart_game();
         
-        this.game.physics.overlap(this.bird, this.pipes, this.restart_game, null, this);
+        this.game.physics.overlap(this.bird, this.pipes, this.hit_pipe, null, this);
+        // roate the bird downward up to a certain point
+        if(this.bird.angle < 20)
+            this.bird.angle += 1;
     },
 
     // Jump function
     jump: function () {
+         // don't jump when dead
+        if (this.bird.alive == false)
+            return;
         // Add vertical velocity to bird (jump)
         this.bird.body.velocity.y = -350;
+        
+        //animation on jump
+        var animation = this.game.add.tween(this.bird);
+        
+        // animate the angle of the bird over 100 milliseconds
+        animation.to({angle: -20}, 100);
+        
+        animation.start();
+        
+       
+        
+        this.jump_sound.play();
+        
     },
 
     restart_game: function () {
@@ -108,6 +136,27 @@ game_state.main.prototype = {
         this.score += 1;
         this.label_score.content = this.score;
     },
+    
+    hit_pipe: function () {
+        
+        // If the bird has already hit a pipe, stop
+        if (this.bird.alive == false)
+            return;
+        
+        // Set the alive property of the bird to false
+        this.bird.alive = false;
+        
+        // Stop pipes from appearing when dead
+        this.game.time.events.remove(this.timer);
+        
+        //Go through all the pipes, and stop their movement
+        
+        this.pipes.forEachAlive (function (p) {
+            p.body.velocity.x = 0;
+        }, this);
+        
+    },
+        
 
 
 
@@ -115,5 +164,5 @@ game_state.main.prototype = {
 };
 
 // Add and start the 'main' state to start the game
-game.state.add('main', game_state.main);
+game.state.add('main', main_state);
 game.state.start('main');
