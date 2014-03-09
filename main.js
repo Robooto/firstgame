@@ -36,7 +36,7 @@ var main_state = {
 
         var space_key = this.game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
 
-        space_key.onDown.add(this.jump, this);
+        game.input.onDown.add(this.jump, this);
 
         // Create a group of pipes - phaser groups are for multiple of the same objects
         this.pipes = game.add.group();
