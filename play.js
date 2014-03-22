@@ -54,6 +54,7 @@ var play_state = {
         
         this.pipes.forEachAlive(function(p) {
             p.body.velocity.x = 0; }, this);
+         
     },
     
     restart_game: function () {
