@@ -15,6 +15,7 @@ var menu_state = {
         // Adding a text centered on the screen
         var text = this.game.add.text(x, y - 50, "Touch to start", style);
         text.anchor.setTo(0.5, 0.5);
+        game.add.tween(text).to({ angle:3 }, 300, Phaser.Easing.Linear.None).to({ angle:-3}, 300, Phaser.Easing.Linear.None).loop().start();
 
         // If the user already played
         if (score > 0) {
@@ -25,7 +26,7 @@ var menu_state = {
         
         if (score > topScore) {
             topScore = score;
-            var success = this.game.add.text(x, y - 100, "You beat your highscore!!", style);
+            var success = this.game.add.text(x, y - 200, "You beat your highscore!!", style);
             success.anchor.setTo(0.5, 0.5);
         }
         if ( topScore > 0) {
